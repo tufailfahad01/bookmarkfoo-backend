@@ -17,7 +17,7 @@ export class Category extends Document {
     roleover: string
 
     @Prop()
-    links: string[]
+    links: object[]
 
     @Prop()
     price: number

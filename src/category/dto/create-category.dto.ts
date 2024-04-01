@@ -1,4 +1,4 @@
-import { IsString, IsUrl, IsNotEmpty, IsArray, IsNumber, IsBoolean, IsMongoId, IsOptional } from 'class-validator';
+import { IsString, IsUrl, IsNotEmpty, IsArray, IsNumber, IsBoolean, IsMongoId, IsOptional, IsObject } from 'class-validator';
 
 export class CreateCategoryDto {
   @IsNotEmpty()
@@ -12,7 +12,7 @@ export class CreateCategoryDto {
   roleover: string;
 
   @IsArray()
-  @IsString({ each: true })
+  @IsObject({ each: true })
   @IsOptional()
   links: string[];
 

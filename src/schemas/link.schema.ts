@@ -9,6 +9,9 @@ export class Link extends Document {
 
     @Prop()
     url: string
+    
+    @Prop()
+    type: string
 
     @Prop()
     is_Published: boolean

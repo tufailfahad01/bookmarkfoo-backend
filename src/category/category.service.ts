@@ -6,12 +6,14 @@ import { Category } from 'src/schemas/category.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { User } from 'src/schemas/user.schema';
+import { Link } from 'src/schemas/link.schema';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
-    @InjectModel(User.name) private readonly userModel: Model<User>
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Link.name) private readonly linkModel: Model<Link>,
   ) { }
 
   async create(createCategoryDto: CreateCategoryDto, user: User): Promise<Category> {
@@ -27,6 +29,9 @@ export class CategoryService {
     }
     try {
       const newCategory = await this.categoryModel.create({ ...createCategoryDto, user: existingUser._id });
+      const linksDto= createCategoryDto.links.map(link=>({...(link as any),category:newCategory._id}))
+      const createLinks= await this.linkModel.create(linksDto);
+      newCategory.links=createLinks;
       return newCategory;
     } catch (error) {
       throw new BadRequestException('Failed to create category', error);
