@@ -1,4 +1,17 @@
-import { IsString, IsUrl, IsNotEmpty, IsArray, IsNumber, IsBoolean, IsMongoId, IsOptional, IsObject } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsUrl, IsNotEmpty, IsArray, IsNumber, IsBoolean, IsMongoId, IsOptional, IsObject, ValidateNested } from 'class-validator';
+
+class LinkDto{
+  @IsUrl()
+  url:string
+
+  @IsString()
+  type:string
+
+  @IsBoolean()
+  is_Live: boolean;
+}
+
 
 export class CreateCategoryDto {
   @IsNotEmpty()
@@ -13,8 +26,10 @@ export class CreateCategoryDto {
 
   @IsArray()
   @IsObject({ each: true })
+  @ValidateNested({each:true})
+  @Type(()=>LinkDto)
   @IsOptional()
-  links: string[];
+  links: Object[];
 
   @IsNumber()
   price: number;

@@ -9,12 +9,12 @@ export class Link extends Document {
 
     @Prop()
     url: string
-    
+
     @Prop()
     type: string
 
     @Prop()
-    is_Published: boolean
+    is_Live: boolean
 
     @Prop({ default: Date.now })
     created_at: Date
