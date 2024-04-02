@@ -28,10 +28,12 @@ export class CategoryService {
       throw new ConflictException('Category already exists');
     }
     try {
-      const newCategory = await this.categoryModel.create({ ...createCategoryDto, user: existingUser._id, link_count:createCategoryDto.links.length });
-      // const linksDto= createCategoryDto.links.map(link=>({...(link as any),category:newCategory._id}))
-      // const createLinks= await this.linkModel.create(linksDto);
-      // const updateCategoryLinks= await this.categoryModel.findByIdAndUpdate({_id:newCategory._id},{links:createLinks},{new:true});
+      const newCategory = await this.categoryModel.create({
+        ...createCategoryDto,
+        user: existingUser._id,
+        link_count: createCategoryDto.links.length,
+        popularity_count: 0
+      });
       return newCategory;
     } catch (error) {
       throw new BadRequestException('Failed to create category', error);
@@ -52,7 +54,7 @@ export class CategoryService {
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
     try {
-      const updatedCategory = await this.categoryModel.findByIdAndUpdate({ _id: id }, {...updateCategoryDto,link_count:updateCategoryDto.links.length,updated_at:Date.now()}, { new: true }).exec();
+      const updatedCategory = await this.categoryModel.findByIdAndUpdate({ _id: id }, { ...updateCategoryDto, link_count: updateCategoryDto.links.length, updated_at: Date.now() }, { new: true }).exec();
       if (!updatedCategory) {
         throw new NotFoundException('Category not found');
       }

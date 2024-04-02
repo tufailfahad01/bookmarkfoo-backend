@@ -26,9 +26,6 @@ export class Category extends Document {
     link_count: number
 
     @Prop()
-    is_active: boolean
-
-    @Prop()
     is_Published: boolean
 
     @Prop()
