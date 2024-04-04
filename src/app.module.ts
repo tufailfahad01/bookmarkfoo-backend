@@ -8,8 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { LinksModule } from './links/links.module';
-import { DownloadModule } from './download/download.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -17,6 +16,7 @@ import { DownloadModule } from './download/download.module';
     UsersModule,
     AuthModule,
     CloudinaryModule,
+    OrderModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -28,8 +28,6 @@ import { DownloadModule } from './download/download.module';
       },
       inject: [ConfigService],
     }),
-    LinksModule,
-    DownloadModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_PIPE, useClass: ValidationPipe }],
