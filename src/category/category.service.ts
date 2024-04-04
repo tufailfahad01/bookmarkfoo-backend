@@ -13,7 +13,6 @@ export class CategoryService {
   constructor(
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(Link.name) private readonly linkModel: Model<Link>,
   ) { }
 
   async create(createCategoryDto: CreateCategoryDto, user: User): Promise<Category> {

@@ -25,7 +25,7 @@ export class AuthService {
 
         const newUser = await this.userModel.create({
           ...createUserDto,
-          password: hashedPassword
+          password: hashedPassword,
         })
 
         const payload = ({ id: newUser._id, email: newUser.email });

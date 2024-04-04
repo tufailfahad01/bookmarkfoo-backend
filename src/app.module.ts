@@ -10,7 +10,6 @@ import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { LinksModule } from './links/links.module';
 import { DownloadModule } from './download/download.module';
-import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -31,7 +30,6 @@ import { CartModule } from './cart/cart.module';
     }),
     LinksModule,
     DownloadModule,
-    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_PIPE, useClass: ValidationPipe }],
