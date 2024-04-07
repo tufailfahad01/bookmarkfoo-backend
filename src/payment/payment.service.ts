@@ -50,13 +50,14 @@ export class PaymentService {
       throw new BadRequestException(`Error creating payment: ${error.message}`);
     }
   }
-
   async confirmPayment(clientSecret: string, user: User) {
-    const payment = await this.paymentModel.findOne({ client_secret: clientSecret })
+
+    const payment = await this.paymentModel.findOne({ client_secret: clientSecret });
+    const order = await this.orderModel.findById(payment.orderId);
+
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }
-    const order = await this.orderModel.findById(payment.orderId);
     if (!order) {
       throw new NotFoundException('Order not found');
     }
@@ -64,49 +65,48 @@ export class PaymentService {
     try {
       await this.paymentModel.updateOne({ _id: payment._id }, { status: PaymentStatus.Succeeded });
       await this.orderModel.updateOne({ _id: order._id }, { order_status: OrderStatus.COMPLETED });
-
       const categories = await Promise.all(order.categories.map(categoryId =>
         this.categoryModel.findById(categoryId).exec()
       ));
-
-      const hyperlinkStyle = {
-        underline: true,
-        color: { argb: 'FF0000FF' },
-      };
-
-      const attachmentsPromises = categories.map(async category => {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet(category.name);
-        worksheet.addRow(['Your Links', 'Type']);
-        worksheet.addRow(['']);
-        category.links.forEach((link: any) => {
-          worksheet.addRow([
-            { text: link.url, hyperlink: link.url, style: hyperlinkStyle },
-            link.type,
-          ]);
-        })
-        const urlColumn = worksheet.getColumn(1);
-        urlColumn.width = 50;
-        const filename = `${category.name}-${new Date().toISOString()}.xlsx`;
-        await workbook.xlsx.writeFile(filename);
-        const fileContent = await fs.readFile(filename);
-        return { filename, content: fileContent };
-      });
-
-      const attachments = await Promise.all(attachmentsPromises);
-      await this.sendEmail(attachments, user)
-
-      // Delete generated files after sending email
-      await Promise.all(attachments.map(async attachment => {
-        await fs.unlink(attachment.filename);
-      }));
+      const attachments = await this.generateExcelAttachments(categories);
+      await this.sendEmail(attachments, user);
+      await this.deleteGeneratedFiles(attachments);
 
       return {
-        message: "Your links have beent sent to your email",
+        message: "Your links have been sent to your email",
       };
     } catch (error) {
       throw new BadRequestException(`Error confirming payment: ${error.message}`);
     }
+  }
+
+  async generateExcelAttachments(categories: Category[]) {
+    const attachmentsPromises = categories.map(async category => {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet(category.name);
+      worksheet.addRow(['Your Links', 'Type']);
+      worksheet.addRow(['']);
+      category.links.forEach((link: any) => {
+        worksheet.addRow([
+          { text: link.url, hyperlink: link.url, style: { underline: true, color: { argb: 'FF0000FF' } } },
+          link.type,
+        ]);
+      });
+      const urlColumn = worksheet.getColumn(1);
+      urlColumn.width = 50;
+      const filename = `${category.name}-${new Date().toISOString()}.xlsx`;
+      await workbook.xlsx.writeFile(filename);
+      const fileContent = await fs.readFile(filename);
+      return { filename, content: fileContent };
+    });
+
+    return Promise.all(attachmentsPromises);
+  }
+
+  async deleteGeneratedFiles(attachments: { filename: string, content: Buffer }[]) {
+    await Promise.all(attachments.map(async attachment => {
+      await fs.unlink(attachment.filename);
+    }));
   }
 
   async sendEmail(attachments: { filename: string, content: Buffer }[], user: any) {
@@ -116,7 +116,7 @@ export class PaymentService {
       }
 
       await this.mailerService.sendMail({
-        to: user.email, // Replace with recipient's email address
+        to: user.email,
         subject: 'New Order Email',
         html: emailTemplate(user.name),
         attachments: attachments.map(attachment => ({
