@@ -50,14 +50,16 @@ export class PaymentService {
       throw new BadRequestException(`Error creating payment: ${error.message}`);
     }
   }
+
   async confirmPayment(clientSecret: string, user: User) {
 
     const payment = await this.paymentModel.findOne({ client_secret: clientSecret });
-    const order = await this.orderModel.findById(payment.orderId);
 
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }
+
+    const order = await this.orderModel.findById(payment.orderId);
     if (!order) {
       throw new NotFoundException('Order not found');
     }
@@ -65,9 +67,11 @@ export class PaymentService {
     try {
       await this.paymentModel.updateOne({ _id: payment._id }, { status: PaymentStatus.Succeeded });
       await this.orderModel.updateOne({ _id: order._id }, { order_status: OrderStatus.COMPLETED });
-      const categories = await Promise.all(order.categories.map(categoryId =>
-        this.categoryModel.findById(categoryId).exec()
-      ));
+      const categories = await Promise.all(order.categories.map(async (categoryId) => {
+        const catagory = await this.categoryModel.findById(categoryId).exec()
+        await this.categoryModel.updateOne({ _id: categoryId }, { popularity_count: catagory.popularity_count + 1 })
+        return catagory;
+      }));
       const attachments = await this.generateExcelAttachments(categories);
       await this.sendEmail(attachments, user);
       await this.deleteGeneratedFiles(attachments);
