@@ -1,4 +1,3 @@
-import { name } from './../../node_modules/@types/ejs/index.d';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -70,14 +69,24 @@ export class PaymentService {
         this.categoryModel.findById(categoryId).exec()
       ));
 
+      const hyperlinkStyle = {
+        underline: true,
+        color: { argb: 'FF0000FF' },
+      };
+
       const attachmentsPromises = categories.map(async category => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet(category.name);
-        worksheet.addRow(['Your Links']);
+        worksheet.addRow(['Your Links', 'Type']);
         worksheet.addRow(['']);
         category.links.forEach((link: any) => {
-          worksheet.addRow([link.url, link.type]);
+          worksheet.addRow([
+            { text: link.url, hyperlink: link.url, style: hyperlinkStyle },
+            link.type,
+          ]);
         })
+        const urlColumn = worksheet.getColumn(1);
+        urlColumn.width = 50;
         const filename = `${category.name}-${new Date().toISOString()}.xlsx`;
         await workbook.xlsx.writeFile(filename);
         const fileContent = await fs.readFile(filename);
@@ -107,7 +116,7 @@ export class PaymentService {
       }
 
       await this.mailerService.sendMail({
-        to: 'marsad11223.us@gmail.com', // Replace with recipient's email address
+        to: user.email, // Replace with recipient's email address
         subject: 'New Order Email',
         html: emailTemplate(user.name),
         attachments: attachments.map(attachment => ({
@@ -124,6 +133,9 @@ export class PaymentService {
       throw new BadRequestException(`Error sending email: ${error.message}`);
     }
   }
+
+
+  // not required fot now 
 
   async findAll(): Promise<Payment[]> {
     try {
