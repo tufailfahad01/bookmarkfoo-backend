@@ -1,10 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+import { GetUser } from 'src/auth/GetUser.Decorator';
+import { User } from 'src/schemas/user.schema';
+import { Category } from 'src/schemas/category.schema';
+
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/auth/GetUser.Decorator';
-import { User } from 'src/schemas/user.schema';
+import { ReportQueryParams } from './dto/report-query-params.dto';
 
 @Controller('category')
 @UseGuards(AuthGuard('jwt'))
@@ -19,6 +23,13 @@ export class CategoryController {
   @Get('getAll')
   findAll() {
     return this.categoryService.findAll();
+  }
+
+  @Get('getReport')
+  async getReport(
+    @Query(ValidationPipe) queryParams: ReportQueryParams
+  ): Promise<{ categories: Category[], linksDownloaded: number, categoryPurchased: number }> {
+    return this.categoryService.getReport(queryParams);
   }
 
   @Get('get/:id')

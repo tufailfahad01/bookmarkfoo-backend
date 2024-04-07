@@ -69,7 +69,7 @@ export class PaymentService {
       await this.orderModel.updateOne({ _id: order._id }, { order_status: OrderStatus.COMPLETED });
       const categories = await Promise.all(order.categories.map(async (categoryId) => {
         const catagory = await this.categoryModel.findById(categoryId).exec()
-        await this.categoryModel.updateOne({ _id: categoryId }, { popularity_count: catagory.popularity_count + 1 })
+        await this.categoryModel.updateOne({ _id: categoryId }, { popularity_count: catagory.popularity_count + 1, updated_at: Date.now() })
         return catagory;
       }));
       const attachments = await this.generateExcelAttachments(categories);

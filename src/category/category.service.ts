@@ -1,11 +1,12 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model } from 'mongoose';
 
 import { Category } from 'src/schemas/category.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { User } from 'src/schemas/user.schema';
+import { ReportQueryParams } from './dto/report-query-params.dto';
 
 @Injectable()
 export class CategoryService {
@@ -40,6 +41,56 @@ export class CategoryService {
 
   async findAll(): Promise<Category[]> {
     return await this.categoryModel.find().exec();
+  }
+
+  async getReport(
+    queryParams: ReportQueryParams):
+    Promise<{
+      categories: Category[],
+      linksDownloaded: number,
+      categoryPurchased: number
+    }
+    > {
+    try {
+      let categories: Category[] = [];
+      const sortOptions: { [key: string]: 1 | -1 } = {};
+      const query: any = {};
+      let linksDownloaded = 0;
+      let categoryPurchased = 0;
+
+      if (queryParams?.sortBy) {
+        const sortOrder: 1 | -1 = queryParams?.order ? parseInt(queryParams.order) as 1 | -1 : 1;
+        sortOptions[queryParams.sortBy] = sortOrder;
+      }
+
+      if (queryParams?.startDate) {
+        query.created_at = { $gte: new Date(queryParams.startDate) };
+      }
+      if (queryParams?.endDate) {
+        query.created_at = { ...query.created_at, $lte: new Date(queryParams.endDate) };
+      }
+
+      if (Object.keys(sortOptions).length > 0) {
+        categories = await this.categoryModel.find(query).sort(sortOptions).exec();
+      } else {
+        categories = await this.categoryModel.find(query).exec();
+      }
+
+      categories.forEach(category => {
+        if (category.popularity_count > 0) {
+          categoryPurchased++;
+          linksDownloaded += category.links.length;
+        }
+      });
+
+      return {
+        categories,
+        linksDownloaded,
+        categoryPurchased
+      };
+    } catch (error) {
+      throw new BadRequestException(`Failed to fetch report: ${error.message}`);
+    }
   }
 
   async findOne(id: string): Promise<Category> {
