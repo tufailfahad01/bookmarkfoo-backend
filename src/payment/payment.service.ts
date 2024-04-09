@@ -31,7 +31,7 @@ export class PaymentService {
       });
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: createPaymentDto.amount * 100, // convert dollars into cents
+        amount: parseInt((createPaymentDto.amount * 100).toFixed(0)), // convert dollars into cents
         currency: createPaymentDto.currency,
       });
 
