@@ -122,7 +122,7 @@ export class PaymentService {
       await this.mailerService.sendMail({
         to: user.email,
         subject: 'New Order Email',
-        html: emailTemplate(user.name),
+        text: emailTemplate(user.name),
         attachments: attachments.map(attachment => ({
           filename: attachment.filename,
           content: attachment.content,

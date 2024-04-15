@@ -19,8 +19,8 @@ import { CategorySchema } from 'src/schemas/category.schema';
         port: 587,
         secure: false,
         auth: {
-          user: 'marsad11223@gmail.com',
-          pass: 'wovh leyv wddz zpbs',
+          user: 'tufailfahad01@gmail.com',
+          pass: 'sruw jmsy burs ycxg',
         },
       },
     }),
