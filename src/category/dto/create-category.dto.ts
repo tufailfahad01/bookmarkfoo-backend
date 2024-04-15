@@ -32,6 +32,7 @@ export class CreateCategoryDto {
   links: Object[];
 
   @IsNumber()
+  @IsOptional()
   price: number;
 
   @IsBoolean()

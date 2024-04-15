@@ -19,7 +19,7 @@ export class Category extends Document {
   @Prop()
   links: object[]
 
-  @Prop()
+  @Prop({ default: 0 })
   price: number
 
   @Prop()
