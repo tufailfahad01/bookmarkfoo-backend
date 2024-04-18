@@ -3,6 +3,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/schemas/user.schema';
+import { GetUser } from 'src/auth/GetUser.Decorator';
+import { IsAdmin } from 'src/utils/helper';
 
 
 @Controller('users')
@@ -11,27 +14,42 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post('createUser')
-  create(@Body() createUserDto: CreateUserDto) {
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @GetUser() user: User
+  ) {
+    IsAdmin(user);
     return this.usersService.create(createUserDto);
   }
 
   @Get('getAllUser')
-  findAll() {
+  findAll(@GetUser() user: User) {
+    IsAdmin(user);
     return this.usersService.findAll();
   }
 
   @Get('getOneUser/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @GetUser() user: User) {
+    IsAdmin(user);
     return this.usersService.findOne(id);
   }
 
   @Put('updateUser/:id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @GetUser() user: User
+  ) {
+    IsAdmin(user);
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete('deleteUser/:id')
-  remove(@Param('id') id: string) {
+  remove(
+    @Param('id') id: string,
+    @GetUser() user: User
+  ) {
+    IsAdmin(user);
     return this.usersService.remove(id);
   }
 

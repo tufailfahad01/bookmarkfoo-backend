@@ -1,31 +1,31 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-enum Role{
+export enum Role {
     Admin = 'Admin',
     User = 'User'
 }
 
 @Schema()
-export class User{
+export class User {
     @Prop()
     name: string
 
     @Prop()
-    email:string
+    email: string
 
     @Prop()
-    password:string
+    password: string
 
-    @Prop({default:Role.User})
+    @Prop({ default: Role.User })
     role: Role
 
-    @Prop({default: Date.now})
+    @Prop({ default: Date.now })
     created_at: Date
 
-    @Prop({default: Date.now})
+    @Prop({ default: Date.now })
     updated_at: Date
 
-    @Prop({default: Date.now})
+    @Prop({ default: Date.now })
     deleted_at: Date
 
 }
