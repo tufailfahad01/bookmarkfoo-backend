@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,9 @@ import { User } from 'src/schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { generateStrongPassword } from 'src/utils/helper';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +16,7 @@ export class AuthService {
     @InjectModel(User.name)
     private userModel: mongoose.Model<User>,
     private jwtService: JwtService,
+    private readonly mailerService: MailerService
   ) { }
 
   async register(createUserDto: CreateUserDto) {
@@ -61,6 +65,34 @@ export class AuthService {
     }
     else {
       throw new UnauthorizedException('Incorrect Email or Password');
+    }
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<any> {
+    const { email } = resetPasswordDto;
+    const password = generateStrongPassword();
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException('Email not found');
+    }
+    try {
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        { _id: user._id },
+        { password: hashedPassword, updated_at: Date.now() },
+        { new: true },
+      );
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Reset Password',
+        text: `Your new password for BookmarkFoo is: ${password}`,
+      });
+      return {
+        message: 'Your new password has been sent to your email.',
+      };
+    } catch (error) {
+      throw new BadRequestException('Error while reseting password', error);
     }
   }
 

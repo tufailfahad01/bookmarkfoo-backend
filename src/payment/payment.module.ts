@@ -13,17 +13,6 @@ import { CategorySchema } from 'src/schemas/category.schema';
     MongooseModule.forFeature([{ name: 'Payment', schema: PaymentSchema }]),
     MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
     MongooseModule.forFeature([{ name: 'Category', schema: CategorySchema }]),
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-          user: 'tufailfahad01@gmail.com',
-          pass: 'sruw jmsy burs ycxg',
-        },
-      },
-    }),
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

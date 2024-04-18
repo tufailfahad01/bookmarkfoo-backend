@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -20,6 +21,17 @@ import { PaymentModule } from './payment/payment.module';
     OrderModule,
     PaymentModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'tufailfahad01@gmail.com',
+          pass: 'sruw jmsy burs ycxg',
+        },
+      },
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
