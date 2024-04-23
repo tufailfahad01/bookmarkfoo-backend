@@ -1,10 +1,12 @@
 export const emailTemplate = (name: string) => {
   return `
     Hi ${name},
-    Thank you for your order!\n
-    Your links are attached to this email. Please open them and bookmark them to your favorite browser for easy access later.
-    If you have any questions or need further assistance, feel free to contact us.\n
-    Thank you for choosing us!
-    Your Bookmarks Team
+    Thanks for using Bookmark Foo! Your links are attached - when you open your links bookmark them to your favorite browser for easy access later.
+
+    You can download your links here 
+    
+    Here’s your special offer 10 categories for only $1.99 
+    Enjoy! 
+    Bookmark A team
   `
 }
