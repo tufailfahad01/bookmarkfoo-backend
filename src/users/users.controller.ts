@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/schemas/user.schema';
 import { GetUser } from 'src/auth/GetUser.Decorator';
 import { IsAdmin } from 'src/utils/helper';
-
+import { ContactUsDto } from './dto/contact-us.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard('jwt'))
@@ -20,6 +20,15 @@ export class UsersController {
   ) {
     IsAdmin(user);
     return this.usersService.create(createUserDto);
+  }
+
+  @Post('contactUs')
+  contactUs(
+    @Body() contactUs: ContactUsDto,
+    @GetUser() user: User
+  ) {
+    IsAdmin(user);
+    return this.usersService.contactUs(contactUs, user);
   }
 
   @Get('getAllUser')

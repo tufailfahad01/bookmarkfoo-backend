@@ -5,10 +5,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { ContactUsDto } from './dto/contact-us.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>, private readonly mailerService: MailerService) { }
 
   async validateUser(email: string) {
     let user: any;
@@ -42,6 +44,30 @@ export class UsersService {
     else {
       throw new ConflictException('User already Exist')
     }
+  }
+
+  async contactUs(contactUsDto: ContactUsDto, user: User): Promise<any> {
+    const userFound = await this.userModel.findOne({ email: user.email });
+    const { subject, body } = contactUsDto;
+    try {
+      if (userFound) {
+        await this.mailerService.sendMail({
+          to: 'marsad11223@gmail.com', // replace this email with casy's email
+          subject: subject,
+          text: `Hi Casy, \n\n${body}`
+        });
+
+        return {
+          message: 'Email has been sent to the team'
+        }
+      }
+      else {
+        throw new NotFoundException('user not found')
+      }
+    } catch (err) {
+      throw new BadRequestException(err.message)
+    }
+
   }
 
   async findAll(): Promise<any> {
