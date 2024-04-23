@@ -38,6 +38,9 @@ export class Category extends Document {
   updated_at: Date
 
   @Prop({ default: null })
+  last_purchase_at: Date
+
+  @Prop({ default: null })
   deleted_at: Date
 
 }

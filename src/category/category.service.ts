@@ -64,10 +64,10 @@ export class CategoryService {
       }
 
       if (queryParams?.startDate) {
-        query.created_at = { $gte: new Date(queryParams.startDate) };
+        query.last_purchase_at = { $gte: new Date(queryParams.startDate) };
       }
       if (queryParams?.endDate) {
-        query.created_at = { ...query.created_at, $lte: new Date(queryParams.endDate) };
+        query.last_purchase_at = { ...query.last_purchase_at, $lte: new Date(queryParams.endDate) };
       }
 
       if (Object.keys(sortOptions).length > 0) {
@@ -78,8 +78,8 @@ export class CategoryService {
 
       categories.forEach(category => {
         if (category.popularity_count > 0) {
-          categoryPurchased++;
-          linksDownloaded += category.links.length;
+          categoryPurchased = categoryPurchased + category.popularity_count;
+          linksDownloaded += (category.links.length * category.popularity_count);
         }
       });
 
