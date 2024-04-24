@@ -8,6 +8,9 @@ class LinkDto {
   @IsString()
   type: string
 
+  @IsString()
+  description: string
+
   @IsBoolean()
   is_Live: boolean;
 }
@@ -20,6 +23,10 @@ export class CreateCategoryDto {
 
   @IsUrl()
   image_url: string;
+
+  @IsUrl()
+  @IsOptional()
+  excel_file: string;
 
   @IsString()
   roleover: string;

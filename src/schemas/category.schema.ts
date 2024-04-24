@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { User } from "./user.schema";
+import { IsOptional } from "class-validator";
 @Schema()
 export class Category extends Document {
 
@@ -12,6 +13,10 @@ export class Category extends Document {
 
   @Prop()
   image_url: string
+
+  @Prop()
+  @IsOptional()
+  excel_file: string
 
   @Prop()
   roleover: string

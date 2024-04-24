@@ -73,7 +73,6 @@ export class UsersService {
   async findAll(): Promise<any> {
     try {
       const users = await this.userModel.find().select('-password')
-      console.log(users, 'users')
       return users;
     }
     catch (err) {
