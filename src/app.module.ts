@@ -27,8 +27,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
         port: 587,
         secure: false,
         auth: {
-          user: 'tufailfahad01@gmail.com',
-          pass: 'sruw jmsy burs ycxg',
+          user: 'sales@bookmarkfu.com',
+          pass: 'assq uzre auik jyqn',
         },
       },
     }),
