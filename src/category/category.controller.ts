@@ -34,7 +34,7 @@ export class CategoryController {
     @GetUser() user: User
   ): Promise<{ categories: Category[], linksDownloaded: number, categoryPurchased: number, totalOrders: number, orders: Order[] }> {
     IsAdmin(user);
-    return this.categoryService.getReport(queryParams);
+    return this.categoryService.getReport(queryParams, user);
   }
 
   @Get('get/:id')

@@ -46,22 +46,22 @@ export class CategoryService {
   }
 
   async getReport(
-    queryParams: ReportQueryParams):
-    Promise<{
-      categories: Category[],
-      linksDownloaded: number,
-      categoryPurchased: number,
-      totalOrders: number,
-      orders: Order[],
-    }
-    > {
+    queryParams: ReportQueryParams,
+    user: User
+  ): Promise<{
+    categories: Category[],
+    linksDownloaded: number,
+    categoryPurchased: number,
+    totalOrders: number,
+    orders: Order[],
+  }> {
     try {
       let categories: Category[] = [];
       let orders: Order[] = [];
 
       const sortOptions: { [key: string]: 1 | -1 } = {};
       const query: any = {};
-      const ordeQuery: any = {};
+      const orderQuery: any = {};
       let linksDownloaded = 0;
       let categoryPurchased = 0;
 
@@ -72,11 +72,11 @@ export class CategoryService {
 
       if (queryParams?.startDate) {
         query.last_purchase_at = { $gte: new Date(queryParams.startDate) };
-        ordeQuery.created_at = { $gte: new Date(queryParams.startDate) };
+        orderQuery.created_at = { $gte: new Date(queryParams.startDate) };
       }
       if (queryParams?.endDate) {
         query.last_purchase_at = { ...query.last_purchase_at, $lte: new Date(queryParams.endDate) };
-        ordeQuery.created_at = { ...query.last_purchase_at, $lte: new Date(queryParams.endDate) };
+        orderQuery.created_at = { ...orderQuery.created_at, $lte: new Date(queryParams.endDate) };
       }
 
       if (Object.keys(sortOptions).length > 0) {
@@ -84,22 +84,33 @@ export class CategoryService {
       } else {
         categories = await this.categoryModel.find(query).exec();
       }
-      orders = await this.orderModel.find(ordeQuery).exec();
-      console.log(orders, 'orders')
+
+      orders = await this.orderModel.find(orderQuery).exec();
+      const totalOrders = await this.orderModel.countDocuments().exec();
 
       categories.forEach(category => {
         if (category.popularity_count > 0) {
-          categoryPurchased = categoryPurchased + category.popularity_count;
+          categoryPurchased += category.popularity_count;
           linksDownloaded += (category.links.length * category.popularity_count);
         }
       });
+
+      for (const order of orders) {
+        if (!order.email) {
+          order.email = user.email;
+        }
+        if (!order.username) {
+          order.username = user.name;
+        }
+        order.categories = await this.categoryModel.find({ _id: { $in: order.categories } }).exec();
+      }
 
       return {
         categories,
         linksDownloaded,
         categoryPurchased,
         orders,
-        totalOrders: orders?.length ?? 0
+        totalOrders
       };
     } catch (error) {
       throw new BadRequestException(`Failed to fetch report: ${error.message}`);
