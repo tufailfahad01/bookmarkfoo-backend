@@ -56,38 +56,38 @@ export class CategoryService {
     orders: Order[],
   }> {
     try {
-      let categories: Category[] = [];
-      let orders: Order[] = [];
-
       const sortOptions: { [key: string]: 1 | -1 } = {};
-      const query: any = {};
+      const categoryQuery: any = {};
       const orderQuery: any = {};
       let linksDownloaded = 0;
       let categoryPurchased = 0;
 
+      // Configure sorting options
       if (queryParams?.sortBy) {
         const sortOrder: 1 | -1 = queryParams?.order ? parseInt(queryParams.order) as 1 | -1 : 1;
         sortOptions[queryParams.sortBy] = sortOrder;
       }
 
+      // Configure date filters
       if (queryParams?.startDate) {
-        query.last_purchase_at = { $gte: new Date(queryParams.startDate) };
-        orderQuery.created_at = { $gte: new Date(queryParams.startDate) };
+        const startDate = new Date(queryParams.startDate);
+        categoryQuery.last_purchase_at = { $gte: startDate };
+        orderQuery.created_at = { $gte: startDate };
       }
       if (queryParams?.endDate) {
-        query.last_purchase_at = { ...query.last_purchase_at, $lte: new Date(queryParams.endDate) };
-        orderQuery.created_at = { ...orderQuery.created_at, $lte: new Date(queryParams.endDate) };
+        const endDate = new Date(queryParams.endDate);
+        categoryQuery.last_purchase_at = { ...categoryQuery.last_purchase_at, $lte: endDate };
+        orderQuery.created_at = { ...orderQuery.created_at, $lte: endDate };
       }
 
-      if (Object.keys(sortOptions).length > 0) {
-        categories = await this.categoryModel.find(query).sort(sortOptions).exec();
-      } else {
-        categories = await this.categoryModel.find(query).exec();
-      }
+      // Fetch categories and orders
+      const [categories, orders, totalOrders] = await Promise.all([
+        this.categoryModel.find(categoryQuery).sort(sortOptions).exec(),
+        this.orderModel.find(orderQuery).exec(),
+        this.orderModel.countDocuments().exec(),
+      ]);
 
-      orders = await this.orderModel.find(orderQuery).exec();
-      const totalOrders = await this.orderModel.countDocuments().exec();
-
+      // Calculate linksDownloaded and categoryPurchased
       categories.forEach(category => {
         if (category.popularity_count > 0) {
           categoryPurchased += category.popularity_count;
@@ -95,27 +95,25 @@ export class CategoryService {
         }
       });
 
-      for (const order of orders) {
-        if (!order.email) {
-          order.email = user.email;
-        }
-        if (!order.username) {
-          order.username = user.name;
-        }
+      // Update orders with user information and fetch related categories
+      await Promise.all(orders.map(async (order: Order) => {
+        order.email = order.email || user.email;
+        order.username = order.username || user.name;
         order.categories = await this.categoryModel.find({ _id: { $in: order.categories } }).exec();
-      }
+      }));
 
       return {
         categories,
         linksDownloaded,
         categoryPurchased,
         orders,
-        totalOrders
+        totalOrders,
       };
     } catch (error) {
       throw new BadRequestException(`Failed to fetch report: ${error.message}`);
     }
   }
+
 
   async findOne(id: string): Promise<Category> {
     const category = await this.categoryModel.findById(id).exec();
