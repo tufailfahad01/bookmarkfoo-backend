@@ -48,13 +48,13 @@ export class UsersService {
 
   async contactUs(contactUsDto: ContactUsDto, user: User): Promise<any> {
     const userFound = await this.userModel.findOne({ email: user.email });
-    const { subject, body } = contactUsDto;
+    const { subject, body, email } = contactUsDto;
     try {
       if (userFound) {
         await this.mailerService.sendMail({
           to: 'sales@bookmarkfu.com', // replace this email with casy's email
           subject: subject,
-          text: `Hi Casy, \n\n${body}`
+          text: `Hi Casy, \n\n${body} \n\n user email: ${email}`
         });
 
         return {
