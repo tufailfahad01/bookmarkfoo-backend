@@ -27,7 +27,6 @@ export class UsersController {
     @Body() contactUs: ContactUsDto,
     @GetUser() user: User
   ) {
-    IsAdmin(user);
     return this.usersService.contactUs(contactUs, user);
   }
 
