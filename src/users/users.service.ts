@@ -52,7 +52,7 @@ export class UsersService {
     try {
       if (userFound) {
         await this.mailerService.sendMail({
-          to: 'marsad11223@gmail.com', // replace this email with casy's email
+          to: 'sales@bookmarkfu.com', // replace this email with casy's email
           subject: subject,
           text: `Hi Casy, \n\n${body}`
         });

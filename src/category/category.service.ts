@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Category } from 'src/schemas/category.schema';
+import { Order } from 'src/schemas/order.schema';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { User } from 'src/schemas/user.schema';
@@ -12,6 +13,7 @@ import { ReportQueryParams } from './dto/report-query-params.dto';
 export class CategoryService {
   constructor(
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) { }
 
@@ -48,13 +50,18 @@ export class CategoryService {
     Promise<{
       categories: Category[],
       linksDownloaded: number,
-      categoryPurchased: number
+      categoryPurchased: number,
+      totalOrders: number,
+      orders: Order[],
     }
     > {
     try {
       let categories: Category[] = [];
+      let orders: Order[] = [];
+
       const sortOptions: { [key: string]: 1 | -1 } = {};
       const query: any = {};
+      const ordeQuery: any = {};
       let linksDownloaded = 0;
       let categoryPurchased = 0;
 
@@ -65,9 +72,11 @@ export class CategoryService {
 
       if (queryParams?.startDate) {
         query.last_purchase_at = { $gte: new Date(queryParams.startDate) };
+        ordeQuery.created_at = { $gte: new Date(queryParams.startDate) };
       }
       if (queryParams?.endDate) {
         query.last_purchase_at = { ...query.last_purchase_at, $lte: new Date(queryParams.endDate) };
+        ordeQuery.created_at = { ...query.last_purchase_at, $lte: new Date(queryParams.endDate) };
       }
 
       if (Object.keys(sortOptions).length > 0) {
@@ -75,6 +84,8 @@ export class CategoryService {
       } else {
         categories = await this.categoryModel.find(query).exec();
       }
+      orders = await this.orderModel.find(ordeQuery).exec();
+      console.log(orders, 'orders')
 
       categories.forEach(category => {
         if (category.popularity_count > 0) {
@@ -86,7 +97,9 @@ export class CategoryService {
       return {
         categories,
         linksDownloaded,
-        categoryPurchased
+        categoryPurchased,
+        orders,
+        totalOrders: orders?.length ?? 0
       };
     } catch (error) {
       throw new BadRequestException(`Failed to fetch report: ${error.message}`);

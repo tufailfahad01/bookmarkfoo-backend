@@ -3,6 +3,8 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/GetUser.Decorator';
+import { User } from 'src/schemas/user.schema';
 
 @Controller('order')
 @UseGuards(AuthGuard('jwt'))
@@ -10,8 +12,11 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
   @Post('create')
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(
+    @Body() createOrderDto: CreateOrderDto,
+    @GetUser() user: User
+  ) {
+    return this.orderService.create(createOrderDto, user);
   }
 
   @Get('findAll')

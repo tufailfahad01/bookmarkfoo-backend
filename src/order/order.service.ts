@@ -5,6 +5,7 @@ import { BuyingOption, CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from 'src/schemas/order.schema';
 import { Category } from 'src/schemas/category.schema';
+import { User } from 'src/schemas/user.schema';
 
 const maxCategoriesAllowed = {
   [BuyingOption.Orange]: 3,
@@ -16,10 +17,11 @@ const maxCategoriesAllowed = {
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>
   ) { }
 
-  async create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto, user: User) {
     const { buying_option, categories } = createOrderDto;
 
     if (!Object.values(BuyingOption).includes(buying_option)) {
@@ -48,8 +50,10 @@ export class OrderService {
       throw new BadRequestException('Duplicate categories are not allowed');
     }
 
+    const userExists = await this.userModel.findOne({ email: user.email });
+
     try {
-      const createdOrder = new this.orderModel(createOrderDto);
+      const createdOrder = new this.orderModel({ ...createOrderDto, user_id: userExists.id });
       return await createdOrder.save();
     } catch (error) {
       throw new BadRequestException(`Error creating order: ${error.message}`);

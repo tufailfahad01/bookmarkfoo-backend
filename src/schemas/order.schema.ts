@@ -10,6 +10,12 @@ export class Order extends Document {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   user_id: User;
 
+  @Prop()
+  username: string;
+
+  @Prop()
+  email: string;
+
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }] })
   categories: Category[];
 

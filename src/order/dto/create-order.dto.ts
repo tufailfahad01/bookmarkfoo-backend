@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsArray, IsNumber, IsMongoId, IsEnum, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsArray, IsNumber, IsMongoId, IsEnum, IsOptional, IsString, IsEmail } from 'class-validator';
 
 export enum BuyingOption {
   Orange = 'Orange',
@@ -14,6 +14,15 @@ export enum OrderStatus {
 }
 
 export class CreateOrderDto {
+  @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
   @IsNumber()
   total_amount: number;
 

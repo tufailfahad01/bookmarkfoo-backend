@@ -10,6 +10,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ReportQueryParams } from './dto/report-query-params.dto';
 import { IsAdmin } from 'src/utils/helper';
+import { Order } from 'src/schemas/order.schema';
 
 @Controller('category')
 @UseGuards(AuthGuard('jwt'))
@@ -31,7 +32,7 @@ export class CategoryController {
   async getReport(
     @Query(ValidationPipe) queryParams: ReportQueryParams,
     @GetUser() user: User
-  ): Promise<{ categories: Category[], linksDownloaded: number, categoryPurchased: number }> {
+  ): Promise<{ categories: Category[], linksDownloaded: number, categoryPurchased: number, totalOrders: number, orders: Order[] }> {
     IsAdmin(user);
     return this.categoryService.getReport(queryParams);
   }
