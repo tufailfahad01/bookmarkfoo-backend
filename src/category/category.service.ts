@@ -80,10 +80,9 @@ export class CategoryService {
       }
 
       // Fetch categories and orders
-      const [categories, orders, totalOrders] = await Promise.all([
+      const [categories, orders] = await Promise.all([
         this.categoryModel.find(categoryQuery).sort(sortOptions).exec(),
-        this.orderModel.find(orderQuery).sort({ created_at: -1 }).exec(),
-        this.orderModel.countDocuments().exec(),
+        this.orderModel.find(orderQuery).sort({ created_at: -1 }).exec()
       ]);
 
       // Calculate linksDownloaded and categoryPurchased
@@ -106,7 +105,7 @@ export class CategoryService {
         linksDownloaded,
         categoryPurchased,
         orders,
-        totalOrders,
+        totalOrders: orders?.length ?? 0,
       };
     } catch (error) {
       throw new BadRequestException(`Failed to fetch report: ${error.message}`);
