@@ -51,7 +51,7 @@ export class PaymentService {
     }
   }
 
-  async confirmPayment(clientSecret: string, user: User) {
+  async confirmPayment(clientSecret: string) {
 
     const payment = await this.paymentModel.findOne({ client_secret: clientSecret });
 
@@ -73,7 +73,7 @@ export class PaymentService {
         return catagory;
       }));
       const attachments = await this.generateExcelAttachments(categories);
-      await this.sendEmail(attachments, user, order);
+      await this.sendEmail(attachments, order);
       await this.deleteGeneratedFiles(attachments);
 
       return {
@@ -115,16 +115,16 @@ export class PaymentService {
     }));
   }
 
-  async sendEmail(attachments: { filename: string, content: Buffer }[], user: User, order: Order) {
+  async sendEmail(attachments: { filename: string, content: Buffer }[], order: Order) {
     try {
       if (!Array.isArray(attachments)) {
         throw new BadRequestException('Attachments must be an array');
       }
 
       await this.mailerService.sendMail({
-        to: order?.email ?? user.email,
+        to: order?.email ?? '',
         subject: 'New Order Email',
-        text: emailTemplate((order?.username ?? user.name), order?.categories?.length, order?.total_amount,),
+        text: emailTemplate((order?.username ?? ''), order?.categories?.length, order?.total_amount,),
         attachments: attachments.map(attachment => ({
           filename: attachment.filename,
           content: attachment.content,

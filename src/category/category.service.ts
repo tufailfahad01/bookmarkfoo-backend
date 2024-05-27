@@ -47,7 +47,6 @@ export class CategoryService {
 
   async getReport(
     queryParams: ReportQueryParams,
-    user: User
   ): Promise<{
     categories: Category[],
     linksDownloaded: number,
@@ -97,8 +96,8 @@ export class CategoryService {
 
       // Update orders with user information and fetch related categories
       await Promise.all(orders.map(async (order: Order) => {
-        order.email = order.email || user.email;
-        order.username = order.username || user.name;
+        order.email = order.email || '';
+        order.username = order.username || '';
         order.categories = await this.categoryModel.find({ _id: { $in: order.categories } }).exec();
       }));
 

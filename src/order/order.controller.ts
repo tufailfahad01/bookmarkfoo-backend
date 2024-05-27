@@ -7,16 +7,14 @@ import { GetUser } from 'src/auth/GetUser.Decorator';
 import { User } from 'src/schemas/user.schema';
 
 @Controller('order')
-@UseGuards(AuthGuard('jwt'))
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
   @Post('create')
   create(
     @Body() createOrderDto: CreateOrderDto,
-    @GetUser() user: User
   ) {
-    return this.orderService.create(createOrderDto, user);
+    return this.orderService.create(createOrderDto);
   }
 
   @Get('findAll')
@@ -29,16 +27,19 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.update(id, updateOrderDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch('updateOrderStatus/:id')
   updateOrderStatus(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.updateOrderStatus(id, updateOrderDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.orderService.remove(id);

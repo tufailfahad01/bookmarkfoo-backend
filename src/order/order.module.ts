@@ -9,7 +9,6 @@ import { UserSchema } from 'src/schemas/user.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
     MongooseModule.forFeature([{ name: 'Category', schema: CategorySchema }]),
   ],

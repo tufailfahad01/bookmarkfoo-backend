@@ -13,10 +13,10 @@ import { IsAdmin } from 'src/utils/helper';
 import { Order } from 'src/schemas/order.schema';
 
 @Controller('category')
-@UseGuards(AuthGuard('jwt'))
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) { }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('create')
   create(@Body() createCategoryDto: CreateCategoryDto, @GetUser() user: User) {
     IsAdmin(user);
@@ -28,13 +28,14 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('getReport')
   async getReport(
     @Query(ValidationPipe) queryParams: ReportQueryParams,
     @GetUser() user: User
   ): Promise<{ categories: Category[], linksDownloaded: number, categoryPurchased: number, totalOrders: number, orders: Order[] }> {
     IsAdmin(user);
-    return this.categoryService.getReport(queryParams, user);
+    return this.categoryService.getReport(queryParams);
   }
 
   @Get('get/:id')
@@ -42,12 +43,14 @@ export class CategoryController {
     return this.categoryService.findOne(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto, @GetUser() user: User) {
     IsAdmin(user);
     return this.categoryService.update(id, updateCategoryDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete('delete/:id')
   remove(@Param('id') id: string, @GetUser() user: User) {
     IsAdmin(user);

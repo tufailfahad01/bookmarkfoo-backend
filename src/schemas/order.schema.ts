@@ -7,9 +7,6 @@ import { BuyingOption, OrderStatus } from "src/order/dto/create-order.dto";
 @Schema()
 export class Order extends Document {
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
-  user_id: User;
-
   @Prop()
   username: string;
 
