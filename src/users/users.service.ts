@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -46,23 +46,17 @@ export class UsersService {
     }
   }
 
-  async contactUs(contactUsDto: ContactUsDto, user: User): Promise<any> {
-    const userFound = await this.userModel.findOne({ email: user.email });
+  async contactUs(contactUsDto: ContactUsDto): Promise<any> {
     const { subject, body, email } = contactUsDto;
     try {
-      if (userFound) {
-        await this.mailerService.sendMail({
-          to: 'sales@bookmarkfu.com', // replace this email with casy's email
-          subject: subject,
-          text: `Hi Casy, \n\n${body} \n\n user email: ${email}`
-        });
+      await this.mailerService.sendMail({
+        to: 'sales@bookmarkfu.com', // replace this email with casy's email
+        subject: subject,
+        text: `Hi Casy, \n\n${body} \n\n user email: ${email}`
+      });
 
-        return {
-          message: 'Email has been sent to the team'
-        }
-      }
-      else {
-        throw new NotFoundException('user not found')
+      return {
+        message: 'Email has been sent to the team'
       }
     } catch (err) {
       throw new BadRequestException(err.message)

@@ -25,10 +25,7 @@ export class UsersController {
   @Post('contactUs')
   contactUs(
     @Body() contactUs: ContactUsDto,
-    @GetUser() user: User
-  ) {
-    return this.usersService.contactUs(contactUs, user);
-  }
+  ) { return this.usersService.contactUs(contactUs); }
 
   @Get('getAllUser')
   findAll(@GetUser() user: User) {
