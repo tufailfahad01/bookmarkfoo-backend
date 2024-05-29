@@ -9,10 +9,10 @@ import { IsAdmin } from 'src/utils/helper';
 import { ContactUsDto } from './dto/contact-us.dto';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'))
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('createUser')
   create(
     @Body() createUserDto: CreateUserDto,
@@ -27,18 +27,21 @@ export class UsersController {
     @Body() contactUs: ContactUsDto,
   ) { return this.usersService.contactUs(contactUs); }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('getAllUser')
   findAll(@GetUser() user: User) {
     IsAdmin(user);
     return this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('getOneUser/:id')
   findOne(@Param('id') id: string, @GetUser() user: User) {
     IsAdmin(user);
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put('updateUser/:id')
   update(
     @Param('id') id: string,
@@ -49,6 +52,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete('deleteUser/:id')
   remove(
     @Param('id') id: string,
