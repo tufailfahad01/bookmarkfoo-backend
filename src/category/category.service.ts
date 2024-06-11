@@ -102,22 +102,35 @@ export class CategoryService {
       ]);
 
       // Update orders with user information and fetch related categories
+      const filteredCategories: Category[] = [];
+      const purchasedTrack = {};
       await Promise.all(
         orders.map(async (order: Order) => {
           order.email = order.email || '';
           order.username = order.username || '';
-          order.categories.forEach((category) => {
-            categoryPurchased += 1;
-            linksDownloaded += category.link_count;
-          });
           order.categories = await this.categoryModel
             .find({ _id: { $in: order.categories } })
             .exec();
+          order.categories.forEach((category) => {
+            categoryPurchased += 1;
+            linksDownloaded += category?.links?.length ?? 0;
+
+            if (!purchasedTrack[category?.id]) {
+              filteredCategories.push(category);
+              purchasedTrack[category?.id] = 1;
+            } else {
+              purchasedTrack[category?.id] += 1;
+            }
+          });
         }),
       );
 
+      filteredCategories.forEach((category) => {
+        category.popularity_count = purchasedTrack[category?.id] ?? 0;
+      });
+
       return {
-        categories,
+        categories: filteredCategories,
         linksDownloaded,
         categoryPurchased,
         orders,
