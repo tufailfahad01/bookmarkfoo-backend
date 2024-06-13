@@ -55,7 +55,7 @@ export class CategoryService {
   }
 
   async findAll(): Promise<Category[]> {
-    return await this.categoryModel.find().exec();
+    return await this.categoryModel.find({ isDeleted: false }).exec();
   }
 
   async getReport(queryParams: ReportQueryParams): Promise<{
@@ -142,9 +142,11 @@ export class CategoryService {
   }
 
   async findOne(id: string): Promise<Category> {
-    const category = await this.categoryModel.findById(id).exec();
+    const category = await this.categoryModel
+      .findOne({ _id: id, isDeleted: false })
+      .exec();
     if (!category) {
-      throw new NotFoundException('Category not found');
+      throw new NotFoundException('Category not found or has been deleted');
     }
     return category;
   }
@@ -176,7 +178,16 @@ export class CategoryService {
 
   async remove(id: string): Promise<void> {
     const deletedCategory = await this.categoryModel
-      .findByIdAndDelete(id)
+      .findByIdAndUpdate(
+        { _id: id },
+        {
+          updated_at: Date.now(),
+          isDeleted: true,
+          is_Published: false,
+          deleted_at: Date.now(),
+        },
+        { new: true },
+      )
       .exec();
     if (!deletedCategory) {
       throw new NotFoundException('Category not found');
