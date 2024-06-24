@@ -38,7 +38,7 @@ export class CategoryService {
       throw new NotFoundException('User not found');
     }
 
-    if (existingCategory) {
+    if (existingCategory && !existingCategory.isDeleted) {
       throw new ConflictException('Category already exists');
     }
     try {
