@@ -11,6 +11,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ReportQueryParams } from './dto/report-query-params.dto';
 import { IsAdmin } from 'src/utils/helper';
 import { Order } from 'src/schemas/order.schema';
+import { GetCategoriesDto } from './dto/get-categories.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -23,9 +24,17 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto, user);
   }
 
+  @Get('types')
+  async getUniqueTypes(): Promise<{ array: string[] }> {
+    return this.categoryService.getUniqueTypes();
+  }
   @Get('getAll')
   findAll() {
     return this.categoryService.findAll();
+  }
+  @Post('filter') // Changed to POST and added 'filter' endpoint
+  async getCategories(@Body() getCategoriesDto: GetCategoriesDto): Promise<Category[]> {
+    return this.categoryService.getCategories(getCategoriesDto);
   }
 
   @UseGuards(AuthGuard('jwt'))

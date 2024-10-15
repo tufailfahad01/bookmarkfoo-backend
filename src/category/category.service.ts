@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,6 +15,7 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { User } from 'src/schemas/user.schema';
 import { ReportQueryParams } from './dto/report-query-params.dto';
 import { OrderStatus } from 'src/order/dto/create-order.dto';
+import { GetCategoriesDto } from './dto/get-categories.dto';
 
 @Injectable()
 export class CategoryService {
@@ -54,8 +56,37 @@ export class CategoryService {
     }
   }
 
+  async getUniqueTypes(): Promise<{ array: string[] }> {
+    try {
+      const result = await this.categoryModel.aggregate([
+        { $match: { type: { $ne: null } } },
+        { $group: { _id: '$type' } },
+        { $project: { _id: 1 } }
+      ]);
+      const types = result.map(item => item._id);
+      return { "array": types };
+    } catch (error) {
+      throw new InternalServerErrorException('An error occurred while fetching unique types.');
+    }
+  }
   async findAll(): Promise<Category[]> {
     return await this.categoryModel.find({ isDeleted: false }).exec();
+  }
+  async getCategories(getCategoriesDto: GetCategoriesDto): Promise<Category[]> {
+    const { type } = getCategoriesDto;
+    try {
+      const filter = type ? { type } : {};
+      const categories = await this.categoryModel.find(filter).exec();
+      if (!categories.length) {
+        throw new NotFoundException('No categories found for the specified type.');
+      }
+      return categories;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('An error occurred while fetching categories.');
+    }
   }
 
   async getReport(queryParams: ReportQueryParams): Promise<{

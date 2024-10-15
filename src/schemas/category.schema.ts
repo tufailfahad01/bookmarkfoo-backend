@@ -49,6 +49,9 @@ export class Category extends Document {
 
   @Prop({ default: null })
   deleted_at: Date;
+  
+  @Prop()
+  type: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
