@@ -14,5 +14,6 @@ import { UserSchema } from 'src/schemas/user.schema';
   ],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService]
 })
 export class OrderModule { }

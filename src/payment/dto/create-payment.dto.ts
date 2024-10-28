@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsArray, IsNumber, IsMongoId, IsEnum, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsArray, IsNumber, IsMongoId, IsEnum, IsOptional, IsEmail, IsString } from 'class-validator';
+import { BuyingOption, OrderStatus } from 'src/order/dto/create-order.dto';
 
 export enum PaymentStatus {
   RequiresPaymentMethod = 'requires_payment_method',
@@ -26,17 +27,45 @@ export enum Currency {
 export class CreatePaymentDto {
 
   @IsMongoId()
-  @IsNotEmpty()
+  @IsOptional()
   orderId: string;
 
   @IsNumber()
+  @IsOptional()
   amount: number;
 
   @IsEnum(Currency)
+  @IsOptional()
   currency: Currency;
 
   @IsEnum(PaymentStatus)
   @IsOptional()
   status: PaymentStatus;
+
+  @IsOptional()
+  @IsString()
+  username: string;
+
+  @IsString()
+  @IsOptional()
+  @IsEmail()
+  email: string;
+
+  @IsNumber()
+  @IsOptional()
+  total_amount: number;
+
+  @IsArray()
+  @IsMongoId({ each: true })
+  @IsOptional()
+  categories: string[];
+
+  @IsEnum(BuyingOption)
+  @IsOptional()
+  buying_option: BuyingOption;
+
+  @IsEnum(OrderStatus)
+  @IsOptional()
+  order_status: OrderStatus;
 }
 

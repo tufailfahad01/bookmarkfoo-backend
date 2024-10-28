@@ -10,12 +10,12 @@ import { User } from 'src/schemas/user.schema';
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
-  @Post('create')
-  create(
-    @Body() createOrderDto: CreateOrderDto,
-  ) {
-    return this.orderService.create(createOrderDto);
-  }
+  // @Post('create')
+  // create(
+  //   @Body() createOrderDto: CreateOrderDto,
+  // ) {
+  //   return this.orderService.create(createOrderDto);
+  // }
 
   @Get('findAll')
   findAll() {

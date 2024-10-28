@@ -18,6 +18,7 @@ import { OrderStatus } from 'src/order/dto/create-order.dto';
 import { Category } from 'src/schemas/category.schema';
 import { User } from 'src/schemas/user.schema';
 import { emailTemplate } from './getEmailTemplate';
+import { OrderService } from 'src/order/order.service';
 
 @Injectable()
 export class PaymentService {
@@ -26,12 +27,15 @@ export class PaymentService {
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
     private readonly mailerService: MailerService,
+    private readonly orderService: OrderService
   ) {}
 
   async create(
     createPaymentDto: CreatePaymentDto,
   ): Promise<Stripe.Response<Stripe.PaymentIntent>> {
     try {
+      const createOrder = await this.orderService.create(createPaymentDto)
+      console.log('createOrder', createOrder)
       const stripe = new Stripe(process.env.StripeSecretKey, {
         apiVersion: '2023-10-16',
       });
@@ -46,7 +50,7 @@ export class PaymentService {
         currency: createPaymentDto.currency,
         status: paymentIntent.status,
         client_secret: paymentIntent.client_secret,
-        orderId: createPaymentDto.orderId,
+        orderId: createOrder._id,
       });
 
       await payment.save();

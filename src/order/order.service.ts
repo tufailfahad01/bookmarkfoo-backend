@@ -19,7 +19,7 @@ export class OrderService {
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>
   ) { }
 
-  async create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: any) {
     const { buying_option, categories } = createOrderDto;
 
     if (!Object.values(BuyingOption).includes(buying_option)) {
