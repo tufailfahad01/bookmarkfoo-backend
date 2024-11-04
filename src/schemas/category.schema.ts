@@ -1,39 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
-import { User } from './user.schema';
-import { IsOptional } from 'class-validator';
+import { Document, Types } from 'mongoose';  // Import Types from mongoose
+import { Topic } from './topic.schema';
+
 @Schema()
 export class Category extends Document {
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
-  user: User;
-
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
-  image_url: string;
-
-  @Prop()
-  @IsOptional()
-  excel_file: string;
-
-  @Prop()
-  roleover: string;
-
-  @Prop()
-  links: object[];
-
-  @Prop({ default: 0 })
-  price: number;
-
-  @Prop()
-  link_count: number;
-
-  @Prop()
-  is_Published: boolean;
-
-  @Prop()
-  popularity_count: number;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Topic' }] }) // Use Types.ObjectId
+  topics: Topic[];
 
   @Prop({ default: Date.now })
   created_at: Date;
@@ -42,16 +17,7 @@ export class Category extends Document {
   updated_at: Date;
 
   @Prop({ default: null })
-  last_purchase_at: Date;
-
-  @Prop({ default: false })
-  isDeleted: boolean;
-
-  @Prop({ default: null })
   deleted_at: Date;
-  
-  @Prop()
-  type: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

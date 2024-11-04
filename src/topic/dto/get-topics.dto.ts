@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from "class-validator";
-export class GetCategoriesDto {
+export class GetTopicsDto {
     @IsOptional()
     @IsString()
     type: string; // Optional type parameter

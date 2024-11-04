@@ -1,48 +1,27 @@
+import { IsArray, IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsString, IsUrl, IsNotEmpty, IsArray, IsNumber, IsBoolean, IsMongoId, IsOptional, IsObject, ValidateNested } from 'class-validator';
-
-class LinkDto {
-  @IsUrl()
-  url: string
-
-  @IsString()
-  type: string
-
-  @IsString()
-  description: string
-
-  @IsBoolean()
-  is_Live: boolean;
-}
-
 
 export class CreateCategoryDto {
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsUrl()
-  image_url: string;
-
-  @IsUrl()
-  @IsOptional()
-  excel_file: string;
-
-  @IsString()
-  roleover: string;
-
   @IsArray()
-  @IsObject({ each: true })
-  @ValidateNested({ each: true })
-  @Type(() => LinkDto)
+  @IsOptional() // This is optional as it may not always be provided
+  topics?: string[]; // Assuming you want to accept an array of topic IDs
+
   @IsOptional()
-  links: Object[];
+  @IsDate()
+  @Type(() => Date) // Use class-transformer to handle date conversion
+  created_at?: Date;
 
-  @IsNumber()
   @IsOptional()
-  price: number;
+  @IsDate()
+  @Type(() => Date)
+  updated_at?: Date;
 
-  @IsBoolean()
-  is_Published: boolean;
-
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  deleted_at?: Date;
 }

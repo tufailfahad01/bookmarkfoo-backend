@@ -1,68 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ValidationPipe, BadRequestException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-
-import { GetUser } from 'src/auth/GetUser.Decorator';
-import { User } from 'src/schemas/user.schema';
-import { Category } from 'src/schemas/category.schema';
-
+import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ReportQueryParams } from './dto/report-query-params.dto';
-import { IsAdmin } from 'src/utils/helper';
-import { Order } from 'src/schemas/order.schema';
-import { GetCategoriesDto } from './dto/get-categories.dto';
-
-@Controller('category')
+import { Category } from 'src/schemas/category.schema';
+@Controller('categories')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) { }
+  constructor(private readonly categoryService: CategoryService) {}
 
-  @UseGuards(AuthGuard('jwt'))
-  @Post('create')
-  create(@Body() createCategoryDto: CreateCategoryDto, @GetUser() user: User) {
-    IsAdmin(user);
-    return this.categoryService.create(createCategoryDto, user);
-  }
+  
 
-  @Get('types')
-  async getUniqueTypes(): Promise<{ array: string[] }> {
-    return this.categoryService.getUniqueTypes();
-  }
-  @Get('getAll')
-  findAll() {
+  @Get()
+  findAll(): Promise<any[]> {
     return this.categoryService.findAll();
   }
-  @Post('filter') // Changed to POST and added 'filter' endpoint
-  async getCategories(@Body() getCategoriesDto: GetCategoriesDto): Promise<Category[]> {
-    return this.categoryService.getCategories(getCategoriesDto);
+
+  @Post('create')
+  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
+    console.log('createCategoryDto', createCategoryDto)
+    return this.categoryService.create(createCategoryDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('getReport')
-  async getReport(
-    @Query(ValidationPipe) queryParams: ReportQueryParams,
-    @GetUser() user: User
-  ): Promise<{ categories: Category[], linksDownloaded: number, categoryPurchased: number, totalOrders: number, orders: Order[] }> {
-    IsAdmin(user);
-    return this.categoryService.getReport(queryParams);
-  }
-
-  @Get('get/:id')
-  findOne(@Param('id') id: string) {
+  @Get(':id')
+  findOne(@Param('id') id: string): Promise<Category | null> {
     return this.categoryService.findOne(id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('update/:id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto, @GetUser() user: User) {
-    IsAdmin(user);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto): Promise<Category | null> {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Delete('delete/:id')
-  remove(@Param('id') id: string, @GetUser() user: User) {
-    IsAdmin(user);
+  @Delete(':id')
+  remove(@Param('id') id: string): Promise<Category | null> {
     return this.categoryService.remove(id);
   }
 }

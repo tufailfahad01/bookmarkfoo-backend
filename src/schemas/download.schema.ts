@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { Category } from "./category.schema"; 
+import { Topic } from "./topic.schema"; 
 import { User } from "./user.schema";
 @Schema()
 export class Download extends Document {
@@ -9,7 +9,7 @@ export class Download extends Document {
     user: User
 
     @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category' })
-    category: Category;
+    category: Topic;
     
     @Prop({ default: Date.now })
     downloaded_at: Date

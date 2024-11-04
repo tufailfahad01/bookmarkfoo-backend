@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { User } from "./user.schema";
-import { Category } from "./category.schema";
+import { Topic } from "./topic.schema";
 import { BuyingOption, OrderStatus } from "src/order/dto/create-order.dto";
 
 @Schema()
@@ -14,7 +14,7 @@ export class Order extends Document {
   email: string;
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }] })
-  categories: Category[];
+  categories: Topic[];
 
   @Prop()
   total_amount: number

@@ -15,7 +15,7 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from 'src/schemas/payment.schema';
 import { Order } from 'src/schemas/order.schema';
 import { OrderStatus } from 'src/order/dto/create-order.dto';
-import { Category } from 'src/schemas/category.schema';
+import { Topic } from 'src/schemas/topic.schema';
 import { User } from 'src/schemas/user.schema';
 import { emailTemplate } from './getEmailTemplate';
 import { OrderService } from 'src/order/order.service';
@@ -25,7 +25,7 @@ export class PaymentService {
   constructor(
     @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
-    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Topic.name) private readonly categoryModel: Model<Topic>,
     private readonly mailerService: MailerService,
     private readonly orderService: OrderService
   ) {}
@@ -112,7 +112,7 @@ export class PaymentService {
     }
   }
 
-  async generateExcelAttachments(categories: Category[]) {
+  async generateExcelAttachments(categories: Topic[]) {
     const attachmentsPromises = categories.map(async (category) => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet(category.name);
@@ -141,7 +141,7 @@ export class PaymentService {
     return Promise.all(attachmentsPromises);
   }
 
-  async generateExcelAttachment(categories: Category[]) {
+  async generateExcelAttachment(categories: Topic[]) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Links');
 

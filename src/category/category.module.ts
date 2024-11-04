@@ -3,18 +3,12 @@ import { CategoryService } from './category.service';
 import { CategoryController } from './category.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CategorySchema } from 'src/schemas/category.schema';
-import { UserSchema } from 'src/schemas/user.schema';
-import { UsersModule } from 'src/users/users.module';
-import { OrderSchema } from 'src/schemas/order.schema';
+import { TopicSchema } from 'src/schemas/topic.schema';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: 'Category', schema: CategorySchema }]),
-    MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    UsersModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: 'Topic', schema: TopicSchema }]),
+    MongooseModule.forFeature([{ name: 'Category', schema: CategorySchema }])],
   controllers: [CategoryController],
   providers: [CategoryService],
 })
-export class CategoryModule { }
+export class CategoryModule {}

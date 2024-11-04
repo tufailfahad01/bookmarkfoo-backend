@@ -6,14 +6,14 @@ import { OrderSchema } from 'src/schemas/order.schema';
 import { PaymentSchema } from 'src/schemas/payment.schema';
 import { PaymentService } from './payment.service';
 import { PaymentController } from './payment.controller';
-import { CategorySchema } from 'src/schemas/category.schema';
+import { TopicSchema } from 'src/schemas/topic.schema';
 import { OrderModule } from 'src/order/order.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Payment', schema: PaymentSchema }]),
     MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
-    MongooseModule.forFeature([{ name: 'Category', schema: CategorySchema }]),
+    MongooseModule.forFeature([{ name: 'Topic', schema: TopicSchema }]),
     OrderModule
   ],
   controllers: [PaymentController],

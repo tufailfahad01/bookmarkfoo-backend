@@ -1,7 +1,7 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CategoryModule } from './category/category.module';
+import { TopicModule } from './topic/topic.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,10 +11,11 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
-    CategoryModule,
+    TopicModule,
     UsersModule,
     AuthModule,
     CloudinaryModule,
@@ -42,6 +43,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       },
       inject: [ConfigService],
     }),
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_PIPE, useClass: ValidationPipe }],
