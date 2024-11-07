@@ -108,7 +108,7 @@ export class TopicService {
       const orderQuery: any = { order_status: OrderStatus.COMPLETED };
       let linksDownloaded = 0;
       let categoryPurchased = 0;
-
+  
       // Configure sorting options
       if (queryParams?.sortBy) {
         const sortOrder: 1 | -1 = queryParams?.order
@@ -116,7 +116,7 @@ export class TopicService {
           : 1;
         sortOptions[queryParams.sortBy] = sortOrder;
       }
-
+  
       // Configure date filters
       if (queryParams?.startDate) {
         const startDate = new Date(queryParams.startDate);
@@ -131,27 +131,36 @@ export class TopicService {
         };
         orderQuery.created_at = { ...orderQuery.created_at, $lte: endDate };
       }
-
+  
       // Fetch categories and orders
       const [categories, orders] = await Promise.all([
         this.topicModel.find(categoryQuery).sort(sortOptions).exec(),
         this.orderModel.find(orderQuery).sort({ created_at: -1 }).exec(),
       ]);
-
-      // Update orders with user information and fetch related categories
+  
+      // Filter categories that were purchased and fetch related category details
       const filteredCategories: Topic[] = [];
-      const purchasedTrack = {};
+      const purchasedTrack: Record<string, number> = {};
+  
       await Promise.all(
         orders.map(async (order: Order) => {
           order.email = order.email || '';
           order.username = order.username || '';
-          order.categories = await this.topicModel
-            .find({ _id: { $in: order.categories } })
+  
+          // Fetch full category details based on the IDs in the order
+          const fullCategories = await this.topicModel
+            .find({ _id: { $in: order.categories } }) // Get full category objects
             .exec();
-          order.categories.forEach((category) => {
+          
+          // Replace category IDs with full category objects in the order
+          order.categories = fullCategories;
+  
+          // Process each category for download links and purchase count
+          fullCategories.forEach((category) => {
             categoryPurchased += 1;
             linksDownloaded += category?.links?.length ?? 0;
-
+  
+            // Track unique categories and their purchase count
             if (!purchasedTrack[category?.id]) {
               filteredCategories.push(category);
               purchasedTrack[category?.id] = 1;
@@ -161,11 +170,12 @@ export class TopicService {
           });
         }),
       );
-
+  
+      // Add popularity count to each unique category
       filteredCategories.forEach((category) => {
         category.popularity_count = purchasedTrack[category?.id] ?? 0;
       });
-
+  
       return {
         categories: filteredCategories,
         linksDownloaded,
@@ -177,6 +187,8 @@ export class TopicService {
       throw new BadRequestException(`Failed to fetch report: ${error.message}`);
     }
   }
+  
+  
 
   async findOne(id: string): Promise<Topic> {
     const category = await this.topicModel
