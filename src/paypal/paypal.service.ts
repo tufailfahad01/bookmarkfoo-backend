@@ -43,7 +43,7 @@ export class PaypalService {
         },
       ],
       application_context: {
-        return_url: `http://localhost:3000/paypal/success/${createOrderDto.orderId}`,
+        return_url: `http://localhost:3000/payment/success/?orderId=${order._id}`,
         cancel_url: 'http://localhost:3000/paypal/cancel',
       },
     });

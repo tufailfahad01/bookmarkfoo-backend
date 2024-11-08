@@ -42,7 +42,7 @@ export class TopicService {
   
     try {
       // Create the new topic and associate the user and category
-      const newTopic = await this.topicModel.create({
+      const newTopic :any = await this.topicModel.create({
         ...createTopicDto,
         user: existingUser._id,
         link_count: createTopicDto.links.length,
