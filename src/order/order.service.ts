@@ -5,6 +5,7 @@ import { BuyingOption, CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from 'src/schemas/order.schema';
 import { Category } from 'src/schemas/category.schema';
+import { Topic } from 'src/schemas/topic.schema';
 
 const maxCategoriesAllowed = {
   [BuyingOption.Orange]: 3,
@@ -16,7 +17,7 @@ const maxCategoriesAllowed = {
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
-    @InjectModel(Category.name) private readonly categoryModel: Model<Category>
+    @InjectModel(Topic.name) private readonly categoryModel: Model<Topic>
   ) { }
 
   async create(createOrderDto: any) {

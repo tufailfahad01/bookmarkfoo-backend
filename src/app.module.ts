@@ -12,6 +12,7 @@ import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CategoryModule } from './category/category.module';
+import { PaypalModule } from './paypal/paypal.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { CategoryModule } from './category/category.module';
       inject: [ConfigService],
     }),
     CategoryModule,
+    PaypalModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_PIPE, useClass: ValidationPipe }],
