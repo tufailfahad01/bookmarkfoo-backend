@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ValidationPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  ValidationPipe,
+  BadRequestException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { GetUser } from 'src/auth/GetUser.Decorator';
@@ -15,7 +27,7 @@ import { GetTopicsDto } from './dto/get-topics.dto';
 
 @Controller('topic')
 export class TopicController {
-  constructor(private readonly topicService: TopicService) { }
+  constructor(private readonly topicService: TopicService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('create')
@@ -28,12 +40,17 @@ export class TopicController {
   async getUniqueTypes(): Promise<{ array: string[] }> {
     return this.topicService.getUniqueTypes();
   }
+
   @Get('getAll')
-  findAll() {
-    return this.topicService.findAll();
-  }
+findAll(@Body() filterDto: { categoryId?: string }) {
+  return this.topicService.findAll(filterDto);
+}
+
+
   @Post('filter') // Changed to POST and added 'filter' endpoint
-  async getCategories(@Body() getCategoriesDto: GetTopicsDto): Promise<Topic[]> {
+  async getCategories(
+    @Body() getCategoriesDto: GetTopicsDto,
+  ): Promise<Topic[]> {
     return this.topicService.getCategories(getCategoriesDto);
   }
 
@@ -41,8 +58,14 @@ export class TopicController {
   @Get('getReport')
   async getReport(
     @Query(ValidationPipe) queryParams: ReportQueryParams,
-    @GetUser() user: User
-  ): Promise<{ categories: Topic[], linksDownloaded: number, categoryPurchased: number, totalOrders: number, orders: Order[] }> {
+    @GetUser() user: User,
+  ): Promise<{
+    categories: Topic[];
+    linksDownloaded: number;
+    categoryPurchased: number;
+    totalOrders: number;
+    orders: Order[];
+  }> {
     IsAdmin(user);
     return this.topicService.getReport(queryParams);
   }
@@ -54,7 +77,11 @@ export class TopicController {
 
   @UseGuards(AuthGuard('jwt'))
   @Patch('update/:id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateTopicDto, @GetUser() user: User) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateTopicDto,
+    @GetUser() user: User,
+  ) {
     IsAdmin(user);
     return this.topicService.update(id, updateCategoryDto);
   }

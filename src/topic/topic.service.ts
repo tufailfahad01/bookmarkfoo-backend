@@ -75,9 +75,16 @@ export class TopicService {
       throw new InternalServerErrorException('An error occurred while fetching unique types.');
     }
   }
-  async findAll(): Promise<Topic[]> {
-    return await this.topicModel.find({ isDeleted: false }).exec();
+  async findAll(filterDto: { categoryId?: string }): Promise<Topic[]> {
+    const query = { isDeleted: false };
+
+    if (filterDto.categoryId) {
+      query['category'] = filterDto.categoryId;
+    }
+    return await this.topicModel.find(query).exec();
   }
+  
+  
   async getCategories(getTopicsDto: GetTopicsDto): Promise<Topic[]> {
     const { type } = getTopicsDto;
     try {
