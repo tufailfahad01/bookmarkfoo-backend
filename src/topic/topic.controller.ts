@@ -41,7 +41,7 @@ export class TopicController {
     return this.topicService.getUniqueTypes();
   }
 
-  @Get('getAll')
+  @Post('getAll')
 findAll(@Body() filterDto: { categoryId?: string }) {
   return this.topicService.findAll(filterDto);
 }
