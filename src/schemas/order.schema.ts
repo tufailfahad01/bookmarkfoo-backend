@@ -13,7 +13,7 @@ export class Order extends Document {
   @Prop()
   email: string;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Category' }] })
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Topic' }] })
   categories: Topic[];
 
   @Prop()

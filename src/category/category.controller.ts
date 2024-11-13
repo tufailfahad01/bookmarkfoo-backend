@@ -14,6 +14,11 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
+  @Get('published-topics')
+  findAllWithPublishedTopics(): Promise<any[]> {
+    return this.categoryService.findAllWithPublishedTopics();
+  }
+
   @Post('create')
   create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
     console.log('createCategoryDto', createCategoryDto)

@@ -31,9 +31,9 @@ export class TopicController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('create')
-  create(@Body() createCategoryDto: CreateTopicDto, @GetUser() user: User) {
+  create(@Body() createTopicDto: CreateTopicDto, @GetUser() user: User) {
     IsAdmin(user);
-    return this.topicService.create(createCategoryDto, user);
+    return this.topicService.create(createTopicDto, user);
   }
 
   @Get('types')
@@ -48,10 +48,10 @@ findAll(@Body() filterDto: { categoryId?: string }) {
 
 
   @Post('filter') // Changed to POST and added 'filter' endpoint
-  async getCategories(
-    @Body() getCategoriesDto: GetTopicsDto,
+  async gettopics(
+    @Body() getTopicsDto: GetTopicsDto,
   ): Promise<Topic[]> {
-    return this.topicService.getCategories(getCategoriesDto);
+    return this.topicService.getTopics(getTopicsDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -60,7 +60,7 @@ findAll(@Body() filterDto: { categoryId?: string }) {
     @Query(ValidationPipe) queryParams: ReportQueryParams,
     @GetUser() user: User,
   ): Promise<{
-    categories: Topic[];
+    topics: Topic[];
     linksDownloaded: number;
     categoryPurchased: number;
     totalOrders: number;
@@ -79,11 +79,11 @@ findAll(@Body() filterDto: { categoryId?: string }) {
   @Patch('update/:id')
   update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateTopicDto,
+    @Body() updateTopicDto: UpdateTopicDto,
     @GetUser() user: User,
   ) {
     IsAdmin(user);
-    return this.topicService.update(id, updateCategoryDto);
+    return this.topicService.update(id, updateTopicDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
